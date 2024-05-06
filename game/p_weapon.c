@@ -815,13 +815,13 @@ BLASTER / HYPERBLASTER
 
 void Blaster_Fire (edict_t *ent, vec3_t g_offset, int damage, qboolean hyper, int effect)
 {
-	vec3_t	forward, right;
+	vec3_t	forward, right, up;
 	vec3_t	start;
 	vec3_t	offset;
 
 	if (is_quad)
 		damage *= 4;
-	AngleVectors (ent->client->v_angle, forward, right, NULL);
+	AngleVectors (ent->client->v_angle, forward, right, up);
 	VectorSet(offset, 24, 8, ent->viewheight-8);
 	VectorAdd (offset, g_offset, offset);
 	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
@@ -829,17 +829,17 @@ void Blaster_Fire (edict_t *ent, vec3_t g_offset, int damage, qboolean hyper, in
 	VectorScale (forward, -2, ent->client->kick_origin);
 	ent->client->kick_angles[0] = -1;
 
-	fire_blaster (ent, start, forward, damage, 1000, effect, hyper);
+	fire_rail (ent, start, forward, damage, 1000);
 
 	start[0] += right[0] * 10;
 	start[1] += right[1] * 10;
 	start[2] += right[2] * 10;
-	fire_blaster(ent, start, forward, damage, 1000, effect, hyper);
+	fire_rail (ent, start, forward, damage, 1000);
 
-	start[0] -= right[0] * 20;
-	start[1] -= right[1] * 20;
-	start[2] -= right[2] * 20;
-	fire_blaster(ent, start, forward, damage, 1000, effect, hyper);
+	start[0] -= up[0] * 20;
+	start[1] -= up[2] * 20;
+	start[2] -= up[2] * 20;
+	fire_rail (ent, start, forward, damage, 1000);
 
 	// send muzzle flash
 	gi.WriteByte (svc_muzzleflash);
@@ -882,7 +882,7 @@ void Weapon_HyperBlaster_Fire (edict_t *ent)
 	int		effect;
 	int		damage;
 
-	ent->client->weapon_sound = gi.soundindex("weapons/hyprbl1a.wav");
+	ent->client->weapon_sound = gi.soundindex("weapons/noammo.wav");
 
 	if (!(ent->client->buttons & BUTTON_ATTACK))
 	{
@@ -938,7 +938,7 @@ void Weapon_HyperBlaster_Fire (edict_t *ent)
 
 	if (ent->client->ps.gunframe == 12)
 	{
-		gi.sound(ent, CHAN_AUTO, gi.soundindex("weapons/hyprbd1a.wav"), 1, ATTN_NORM, 0);
+		gi.sound(ent, CHAN_AUTO, gi.soundindex("weapons/noammo.wav"), 1, ATTN_NORM, 0);
 		ent->client->weapon_sound = 0;
 	}
 
@@ -949,7 +949,7 @@ void Weapon_HyperBlaster (edict_t *ent)
 	static int	pause_frames[]	= {0};
 	static int	fire_frames[]	= {6, 7, 8, 9, 10, 11, 0};
 
-	Weapon_Generic (ent, 5, 20, 49, 53, pause_frames, fire_frames, Weapon_HyperBlaster_Fire);
+	Weapon_Generic (ent, 5, 20, 49, 53, pause_frames, fire_frames, weapon_grenadelauncher_fire);
 }
 
 /*
